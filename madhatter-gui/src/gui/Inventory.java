@@ -1,5 +1,7 @@
 package gui;
 
+import scanning.FindBookInfo;
+
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
@@ -180,7 +182,11 @@ public class Inventory {
 		btnExit.setBounds(178, 317, 85, 21);
 		frame.getContentPane().add(btnExit);
 		
-		JButton btnClear = new JButton("Clear");
+		JButton btnClear = new JButton("Bulk Save");
+		btnClear.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
 		btnClear.setBounds(311, 317, 85, 21);
 		frame.getContentPane().add(btnClear);
 		
@@ -417,7 +423,9 @@ public class Inventory {
 			}
 		}
 		
-		
+		public void bulkSaveISBN() {
+			
+		}
 
 
 

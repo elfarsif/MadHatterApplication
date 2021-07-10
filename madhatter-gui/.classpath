@@ -12,5 +12,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="C:/Users/Frank/rs2xml/rs2xml/rs2xml.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Frank/Eclipse Libraries/java-json.jar/java-json.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
