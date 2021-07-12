@@ -23,9 +23,8 @@ public class IsbnLookup {
 	
 	public static void main(String[] args) throws IOException, JSONException {  
 		//read json
-		readJSON();
+		readJSON("bookCsv.csv");
 		
-		// write to csv file
 		
 		  
 		 
@@ -54,11 +53,11 @@ public class IsbnLookup {
 	    }
 	  }
 	
-	public static void readJSON() throws IOException, JSONException {
+	public static void readJSON(String csv) throws IOException, JSONException {
 		//read csv of isbn, find the info from api, write info to csvfile
 		
 		//read csv file
-		File csvFile= new File("bookCsv.csv");
+		File csvFile= new File(csv);
 		BufferedReader br = new BufferedReader(new FileReader(csvFile));
 		
 		String line = "";
@@ -85,24 +84,29 @@ public class IsbnLookup {
 		
 		Iterator iterator = bookisbn.iterator();
 		
+		//search api with all isbn in bookisbn and add to csv file
 	    while (iterator.hasNext()) {
 	    	
-	    	System.out.println(iterator.next());
+	    	
 	    	String title = null;
+	    	String year = null;
+	    	String isbn = null;
 	    	try {
 				JSONObject json = readJsonFromUrl("https://www.googleapis.com/books/v1/volumes?q=isbn:"+ iterator.next());
 				
 				JSONArray items = json.getJSONArray("items");
 				JSONObject volumeInfo = items.getJSONObject(0).getJSONObject("volumeInfo");
 				
+				isbn = (String) iterator.next();
 				title = volumeInfo.getString("title");
-				String year = volumeInfo.getString("publishedDate");
+				year = volumeInfo.getString("publishedDate");
 				String[] authors = {"",""};
+				
 				for(int i =0; i<volumeInfo.getJSONArray("authors").length();i++) {
 					authors[i] = volumeInfo.getJSONArray("authors").getString(i);
 					
 				}
-				System.out.println(title+", "+year+", "+authors[0]+", ");
+				System.out.println(isbn+", "+title+", "+year+", "+authors[0]+", ");
 				
 				
 			} catch (IOException e) {
@@ -115,11 +119,11 @@ public class IsbnLookup {
 				  
 				  StringBuilder sb = new StringBuilder();
 				  
-				  sb.append("45643423w234"); sb.append(','); sb.append(title);
+				  sb.append(isbn); sb.append(','); sb.append(title);sb.append(','); sb.append(year);
 				  
 				  writer.write(sb.toString());
 				  
-				  System.out.println("done!");
+				  System.out.println("wrote to apiInfo!");
 				  
 	    	} catch (FileNotFoundException e) { 
 					  System.out.println(e.getMessage()); 
@@ -128,11 +132,12 @@ public class IsbnLookup {
 		    
 		    
 		    
-			}
+		}
 	    	
 	    	
 	    }
-	    
+	
+	
 	    
 	
 	

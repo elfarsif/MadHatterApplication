@@ -1,6 +1,6 @@
 package gui;
 
-import scanning.FindBookInfo;
+import scanning.IsbnLookup;
 
 import java.awt.EventQueue;
 
@@ -12,6 +12,10 @@ import java.awt.Font;
 import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import net.proteanit.sql.DbUtils;
 
 import javax.swing.border.EtchedBorder;
@@ -22,10 +26,22 @@ import javax.swing.JTable;
 import javax.swing.JScrollPane;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.net.URL;
+import java.nio.charset.Charset;
+
 
 public class Inventory {
 
@@ -44,6 +60,7 @@ public class Inventory {
 	Connection con;
 	PreparedStatement pst;
 	ResultSet rs;
+	private JTextField txtScan;
 	/**
 	 * Launch the application.
 	 */
@@ -74,7 +91,7 @@ public class Inventory {
 	 */
 	private void initialize() {
 		frame = new JFrame();
-		frame.setBounds(100, 100, 1170, 462);
+		frame.setBounds(100, 100, 1170, 798);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 		
@@ -239,9 +256,50 @@ public class Inventory {
 		});
 		btnClear_1_1.setBounds(816, 352, 85, 21);
 		frame.getContentPane().add(btnClear_1_1);
+		
+		JButton btnNewButton_1 = new JButton("Bulk Save");
+		btnNewButton_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					bulkSaveButton();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+		});
+		btnNewButton_1.setBounds(449, 352, 124, 21);
+		frame.getContentPane().add(btnNewButton_1);
+		
+		JPanel panel_2 = new JPanel();
+		panel_2.setLayout(null);
+		panel_2.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, new Color(255, 255, 255), new Color(160, 160, 160)), "Register", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
+		panel_2.setBounds(10, 445, 404, 63);
+		frame.getContentPane().add(panel_2);
+		
+		JLabel lblNewLabel_2_1 = new JLabel("Scan ISBN");
+		lblNewLabel_2_1.setFont(new Font("Tahoma", Font.BOLD, 13));
+		lblNewLabel_2_1.setBounds(10, 29, 118, 13);
+		panel_2.add(lblNewLabel_2_1);
+		
+		txtScan = new JTextField();
+		txtScan.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyReleased(KeyEvent e) {
+				try {
+					searchApi();
+				} catch (IOException | JSONException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+		});
+		txtScan.setColumns(10);
+		txtScan.setBounds(138, 27, 232, 19);
+		panel_2.add(txtScan);
 	}
 	
-		public void Connect(){
+	public void Connect(){
 		
 		String driver = "com.mysql.jdbc.Driver";
 		
@@ -258,7 +316,7 @@ public class Inventory {
 		
 	}
 
-		public void saveToDatabase() {
+	public void saveToDatabase() {
 			
 			try {
 				
@@ -298,9 +356,9 @@ public class Inventory {
 			}catch (Exception e){
 				System.out.println("error :" + e);
 			}
-		}
+	}
 
-		public void tableLoad() {
+	public void tableLoad() {
 
 			
 			try {
@@ -316,7 +374,7 @@ public class Inventory {
 			}
 		}
 
-		public void searchIsbn() {
+	public void searchIsbn() {
 			
 			try {
 				
@@ -352,7 +410,7 @@ public class Inventory {
 			
 		}
 
-		public void updateButton() {
+	public void updateButton() {
 			
 			try {
 				
@@ -392,7 +450,7 @@ public class Inventory {
 			}
 		}
 		
-		public void deleteButton() {
+	public void deleteButton() {
 			
 			try {
 				
@@ -421,11 +479,157 @@ public class Inventory {
 			}catch (Exception e){
 				System.out.println("error :" + e);
 			}
+	}
+		
+	public void bulkSaveButton() throws IOException {
+		
+		//read isbn with api info
+		File csvFile= new File("apiInfo.csv");
+		BufferedReader br = new BufferedReader(new FileReader(csvFile));
+		
+		String line = "";
+		String isbn = null;
+		String title = null;
+		int year = 0;
+		
+		try {
+			while((line = br.readLine())!=null) {
+				String[] count = line.split(",");
+				isbn = count[0];
+				title = count[1];
+				year = Integer.parseInt(count[2]);
+				
+				
+			}
+		}catch (FileNotFoundException e) {
+			e.printStackTrace();
 		}
 		
-		public void bulkSaveISBN() {
+		//add it to database
+		try {
 			
+			String query = "insert into book(bookisbn,title,author,year,qty,storeprice,bookprice,location) values (?,?,?,?,?,?,?,?)";
+			pst = con.prepareStatement(query);
+			
+			pst.setString(1,isbn);
+			pst.setString(2,title);
+			pst.setString(3,null);
+			pst.setInt(4,year);
+			pst.setInt(5,9999);
+			pst.setDouble(6,99);
+			pst.setDouble(7,99);
+			pst.setString(8,"store");
+			
+			System.out.println(pst);
+			pst.executeUpdate(); 
+			JOptionPane.showMessageDialog(null, "Succesfully added");
+			tableLoad();
+						
+		}catch (Exception e){
+			System.out.println("error :" + e);
+		}	
+			
+	}
+	
+	// these methods are all for searching api
+	public void searchApi() throws IOException, JSONException {
+		
+		String scannedIsbn = txtScan.getText();
+		System.out.println("search api with : "+scannedIsbn);
+		String title = null;
+    	int year = 0;
+    	String isbn = null;
+    	try {
+    		JSONObject json = readJsonFromUrl("https://www.googleapis.com/books/v1/volumes?q=isbn:"+ scannedIsbn);
+			JSONArray items = json.getJSONArray("items");
+			JSONObject volumeInfo = items.getJSONObject(0).getJSONObject("volumeInfo");
+			isbn = scannedIsbn;
+			title = volumeInfo.getString("title");
+			year = Integer.parseInt(volumeInfo.getString("publishedDate"));
+			String[] authors = {"",""};
+			for(int i =0; i<volumeInfo.getJSONArray("authors").length();i++) 
+			{
+				authors[i] = volumeInfo.getJSONArray("authors").getString(i);
+			}
+			
+			System.out.println(isbn+", "+title+", "+year+", "+authors[0]+", ");
+			
+			scanToDatabase(scannedIsbn,title,"frank",year,1,99,99,"store");
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (JSONException e) {
+			e.printStackTrace();
 		}
+		
+			
+			
+	}
+	
+	private static String readAll(Reader rd) throws IOException {
+	    StringBuilder sb = new StringBuilder();
+	    int cp;
+	    while ((cp = rd.read()) != -1) {
+	      sb.append((char) cp);
+	    }
+	    return sb.toString();
+	  }
+
+	public static JSONObject readJsonFromUrl(String url) throws IOException, JSONException {
+	    InputStream is = new URL(url).openStream();
+	    try {
+	      BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
+	      String jsonText = readAll(rd);
+	      JSONObject json = new JSONObject(jsonText);
+	      return json;
+	    } finally {
+	      is.close();
+	    }
+	  }
+	
+	public void scanToDatabase(String scannedIsbn,String title,String author,int year,int qty,double storeprice,double bookprice,String location) {
+		System.out.println("add to database");
+		
+		
+		try { 
+			String query="insert into book(bookisbn,title,author,year,qty,storeprice,bookprice,location) values (?,?,?,?,?,?,?,?)"; 
+			pst = con.prepareStatement(query);
+		  
+			pst.setString(1,scannedIsbn); 
+			pst.setString(2,title);
+			pst.setString(3,author); 
+			pst.setInt(4,year); 
+			pst.setInt(5,qty);
+			pst.setDouble(6,storeprice); 
+			pst.setDouble(7,bookprice); 
+			pst.setString(8,location);
+		  
+			System.out.println(pst); pst.executeUpdate();
+			JOptionPane.showMessageDialog(null, "Succesfully added"); tableLoad();
+		  
+		}catch (Exception e){System.out.println("error :" + e); }
+		
+		txtScan.setText("");
+		//this brings the mouse back to the name text box
+		txtScan.requestFocus();
+		 
+	}
+	//end of api search methods
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
