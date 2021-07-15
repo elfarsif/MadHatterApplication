@@ -1,0 +1,12 @@
+bugs
+
+	-date time format for book
+	-Store price is in usd make cad
+	-add number of books with 0 as msrp
+	-store price algorithm from owners
+	
+
+
+Big:
+	-add POS system
+

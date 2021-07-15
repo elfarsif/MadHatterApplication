@@ -1,0 +1,57 @@
+How would you chose an inventory system?
+
+Ifunanya: -Write down my needs than see which one fits them,
+-the buisness is already visualized. look at templates
+	
+
+What would be your needs?
+
+Ifuanya:
+	-Book info
+	-how many off books
+	-cost of books
+	-notification system for stocking*************************
+	-location within the bookstore
+	
+	-customers interac with comp so that it can act as a digital employee if busy
+	-whats your skin like to match to brand, differences in products based on their answers, description of product
+	-what did you come in for today?
+	-make the in store experiences as seemless as possible
+	-combine online and in store experience
+	-after the product is shown have employee automatically notified
+	-like how chapters print book location then employee shows
+	-Computer should optomize customer experience
+
+	- Quick system startup
+	- Credential login (Easy easy), face/fingerprint recognition
+	- on startup : A quick data anlalysis report, a daily to-do tasks
+	- a way to compare the data/ sales (like stepping on a scale)
+	- whats selling and whats not 
+
+What are the functions you would want?
+
+Subscription vs one time pay?
+
+	-subscription
+
+Do you prefer word of mouth or internet?
+	
+	-google first
+	-whats the best rated
+	-then a person 
+	-if a person says its good
+	-then you check online
+
+	-so they want independently find good reviews
+
+
+How much would you pay?
+
+
+
+Measure whats being requested.
+Authors shelving value.****
+searches
+ask about search by
+
+	-

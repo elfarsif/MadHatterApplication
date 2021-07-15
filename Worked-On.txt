@@ -1,4 +1,0 @@
-7/8/2021
-	-read csv file on FindBookInfo and call it on Inventory.java
-8/8/2021
-	-read isbn from api and put info into csv file	
